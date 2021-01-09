@@ -1,4 +1,4 @@
-const Customer = require("../models/customer.model.js");
+const Sharing = require("../models/sharing.model.js");
 
 exports.create = (req, res) => {
     // Validate request
@@ -8,45 +8,46 @@ exports.create = (req, res) => {
       });
     }
   
-    // Create a Customer
-    const customer = new Customer({
-      email: req.body.email,
-      name: req.body.name,
-      active: req.body.active
+    // Create a Sharing
+    const sharing = new Sharing({
+      title: req.body.title,
+      content: req.body.content,
+      image: req.body.image,
+      users_id: req.body.users_id,
     });
   
-    // Save Customer in the database
-    Customer.create(customer, (err, data) => {
+    // Save Sharing in the database
+    Sharing.create(sharing, (err, data) => {
       if (err)
         res.status(500).send({
           message:
-            err.message || "Some error occurred while creating the Customer."
+            err.message || "Some error occurred while creating the Sharing."
         });
       else res.send(data);
     });
 };
 
 exports.findAll = (req, res) => {
-    Customer.getAll((err, data) => {
+    Sharing.getAll((err, data) => {
       if (err)
         res.status(500).send({
           message:
-            err.message || "Some error occurred while retrieving customers."
+            err.message || "Some error occurred while retrieving sharings."
         });
       else res.send(data);
     });
 };
 
 exports.findOne = (req, res) => {
-    Customer.findById(req.params.customerId, (err, data) => {
+    Sharing.findById(req.params.sharingId, (err, data) => {
       if (err) {
         if (err.kind === "not_found") {
           res.status(404).send({
-            message: `Not found Customer with id ${req.params.customerId}.`
+            message: `Not found Sharing with id ${req.params.sharingId}.`
           });
         } else {
           res.status(500).send({
-            message: "Error retrieving Customer with id " + req.params.customerId
+            message: "Error retrieving Sharing with id " + req.params.sharingId
           });
         }
       } else res.send(data);
@@ -61,18 +62,18 @@ exports.update = (req, res) => {
       });
     }
   
-    Customer.updateById(
-      req.params.customerId,
-      new Customer(req.body),
+    Sharing.updateById(
+      req.params.sharingId,
+      new Sharing(req.body),
       (err, data) => {
         if (err) {
           if (err.kind === "not_found") {
             res.status(404).send({
-              message: `Not found Customer with id ${req.params.customerId}.`
+              message: `Not found Sharing with id ${req.params.sharingId}.`
             });
           } else {
             res.status(500).send({
-              message: "Error updating Customer with id " + req.params.customerId
+              message: "Error updating Sharing with id " + req.params.sharingId
             });
           }
         } else res.send(data);
@@ -81,28 +82,28 @@ exports.update = (req, res) => {
 };
 
 exports.delete = (req, res) => {
-    Customer.remove(req.params.customerId, (err, data) => {
+    Sharing.remove(req.params.sharingId, (err, data) => {
       if (err) {
         if (err.kind === "not_found") {
           res.status(404).send({
-            message: `Not found Customer with id ${req.params.customerId}.`
+            message: `Not found Sharing with id ${req.params.sharingId}.`
           });
         } else {
           res.status(500).send({
-            message: "Could not delete Customer with id " + req.params.customerId
+            message: "Could not delete Sharing with id " + req.params.sharingId
           });
         }
-      } else res.send({ message: `Customer was deleted successfully!` });
+      } else res.send({ message: `Sharing was deleted successfully!` });
     });
 };
 
 exports.deleteAll = (req, res) => {
-    Customer.removeAll((err, data) => {
+    Sharing.removeAll((err, data) => {
       if (err)
         res.status(500).send({
           message:
-            err.message || "Some error occurred while removing all customers."
+            err.message || "Some error occurred while removing all sharings."
         });
-      else res.send({ message: `All Customers were deleted successfully!` });
+      else res.send({ message: `All Sharings were deleted successfully!` });
     });
 };
