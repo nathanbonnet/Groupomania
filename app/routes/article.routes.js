@@ -1,21 +1,24 @@
 module.exports = app => {
   const articles = require("../controllers/article.controller.js");
+  const auth = require('../middlewares/auth');
+  const isAdmin = require('../middlewares/isAdmin');
+  const ownerArticle = require('../middlewares/ownerArticle');
 
   // Create a new Article
-  app.post("/articles", articles.create);
+  app.post("/articles", auth, articles.create);
 
   // Retrieve all Articles
-  app.get("/articles", articles.findAll);
+  app.get("/articles", auth, articles.findAll);
 
   // Retrieve a single Article with articleId
-  app.get("/articles/:articleId", articles.findOne);
+  app.get("/articles/:articleId", auth, articles.findOne);
 
   // Update a Article with articleId
-  app.put("/articles/:articleId", articles.update);
+  app.put("/articles/:articleId", auth, ownerArticle, articles.update);
 
   // Delete a Article with articleId
-  app.delete("/articles/:articleId", articles.delete);
+  app.delete("/articles/:articleId", auth, ownerArticle, articles.delete);
 
-  // Create a new Article
-  app.delete("/articles", articles.deleteAll);
+  // Delete all Article
+  app.delete("/articles", isAdmin, articles.deleteAll);
 };
