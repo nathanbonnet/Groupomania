@@ -15,13 +15,13 @@ module.exports = app => {
   app.get("/users", isAdmin, users.findAll);
 
   // Retrieve a single User with userId
-  app.get("/users/:userId", auth, ownerUser, users.findOne);
+  app.get("/users/:userId", ownerUser, users.findOne);
 
   // Update a User with userId
-  app.put("/users/:userId", auth, ownerUser, users.update);
+  app.put("/users/:userId", ownerUser, users.update);
 
   // Delete a User with userId
-  app.delete("/users/:userId", auth, ownerUser, users.delete);
+  app.delete("/users/:userId", ownerUser, users.delete);
 
   // Delete all User
   app.delete("/users", isAdmin, users.deleteAll);

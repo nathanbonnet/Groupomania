@@ -1,11 +1,11 @@
 const sql = require("./db.js");
 
 // constructor
-const Article = function(article) {
+const Article = function(article, userId) {
   this.title = article.title;
   this.content = article.content;
   this.image = article.image;
-  this.users_id = article.users_id;
+  this.users_id = userId;
 };
 
 Article.create = (newArticle, result) => {
@@ -55,8 +55,8 @@ Article.getAll = result => {
 
 Article.updateById = (id, article, result) => {
   sql.query(
-    "UPDATE articles SET email = ?, name = ?, active = ? WHERE id = ?",
-    [article.email, article.name, article.active, id],
+    "UPDATE articles SET title = ?, content = ?, image = ? WHERE id = ?",
+    [article.title, article.content, article.image, id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);

@@ -1,4 +1,5 @@
 const Article = require("../models/article.model.js");
+const jwt = require('jsonwebtoken');
 
 exports.create = (req, res) => {
     // Validate request
@@ -8,13 +9,15 @@ exports.create = (req, res) => {
       });
     }
   
+    const token = req.headers.authorization.split(" ")[1];
+    const {userId} = jwt.verify(token,'RANDOM_TOKEN_SECRET');
+
     // Create a Article
     const article = new Article({
       title: req.body.title,
       content: req.body.content,
       image: req.body.image,
-      users_id: req.body.users_id,
-    });
+    }, userId);
   
     // Save Article in the database
     Article.create(article, (err, data) => {
@@ -55,17 +58,51 @@ exports.findOne = (req, res) => {
 };
 
 exports.update = (req, res) => {
+    const token = req.headers.authorization.split(" ")[1];
+    const {userId} = jwt.verify(token,'RANDOM_TOKEN_SECRET');
+
     // Validate Request
     if (!req.body) {
       res.status(400).send({
         message: "Content can not be empty!"
       });
     }
-  
-    Article.updateById(
-      req.params.articleId,
-      new Article(req.body),
-      (err, data) => {
+    console.log(req.body);
+    Article.findById(req.params.articleId, (err, data) => {
+      if (!isOwner(req, data)) {
+        res.status(403).send({
+          message: `vous n'avez pas le droit de modifier l'article d'un autre auteur.`
+        });
+      } else {
+        Article.updateById(
+          req.params.articleId,
+          new Article(req.body, userId),
+          (err, data) => {
+            if (err) {
+              if (err.kind === "not_found") {
+                res.status(404).send({
+                  message: `Not found Article with id ${req.params.articleId}.`
+                });
+              } else {
+                res.status(500).send({
+                  message: "Error updating Article with id " + req.params.articleId
+                });
+              }
+            } else res.send(data);
+          }
+        );
+      }
+    });
+};
+
+exports.delete = (req, res) => {
+  Article.findById(req.params.articleId, (err, data) => {
+    if (!isOwner(req, data)) {
+      res.status(403).send({
+        message: `vous n'avez pas le droit de supprimer l'article d'un autre auteur.`
+      });
+    } else {
+      Article.remove(req.params.articleId, (err, data) => {
         if (err) {
           if (err.kind === "not_found") {
             res.status(404).send({
@@ -73,28 +110,13 @@ exports.update = (req, res) => {
             });
           } else {
             res.status(500).send({
-              message: "Error updating Article with id " + req.params.articleId
+              message: "Could not delete Article with id " + req.params.articleId
             });
           }
-        } else res.send(data);
-      }
-    );
-};
-
-exports.delete = (req, res) => {
-    Article.remove(req.params.articleId, (err, data) => {
-      if (err) {
-        if (err.kind === "not_found") {
-          res.status(404).send({
-            message: `Not found Article with id ${req.params.articleId}.`
-          });
-        } else {
-          res.status(500).send({
-            message: "Could not delete Article with id " + req.params.articleId
-          });
-        }
-      } else res.send({ message: `Article was deleted successfully!` });
-    });
+        } else res.send({ message: `Article was deleted successfully!` });
+      });
+    }
+  })
 };
 
 exports.deleteAll = (req, res) => {
@@ -107,3 +129,14 @@ exports.deleteAll = (req, res) => {
       else res.send({ message: `All Articles were deleted successfully!` });
     });
 };
+
+const isOwner = (req, data) => {
+  const token = req.headers.authorization.split(" ")[1];
+  const {userId, isAdmin} = jwt.verify(token,'RANDOM_TOKEN_SECRET');
+
+  if (isAdmin || data.users_id === userId) {
+      return true;
+  } else {
+      return false;
+  }
+}
