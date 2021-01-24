@@ -40,6 +40,7 @@ exports.login = (req, res) => {
     })
 };
 
+
 exports.create = (req, res) => {
     // Validate request
     if (!req.body) {
