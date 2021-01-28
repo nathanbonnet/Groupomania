@@ -4,7 +4,7 @@ module.exports = (req,res,next) => {
     try { 
         const token = req.headers.authorization.split(" ")[1];
         const {userId, isAdmin} = jsw.verify(token,'RANDOM_TOKEN_SECRET');
-        if (req.body.userId && (isAdmin || parseInt(req.params.userId) === userId)) {
+        if (req.params.userId && (isAdmin || parseInt(req.params.userId) === userId)) {
             next();
         } else {
             throw "vous ne pouvez pas modifier quelqu'un d'autre que vous !";

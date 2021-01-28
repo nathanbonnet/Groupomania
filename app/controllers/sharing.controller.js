@@ -1,4 +1,5 @@
 const Sharing = require("../models/sharing.model.js");
+const jwt = require('jsonwebtoken');
 
 exports.create = (req, res) => {
     // Validate request
@@ -8,12 +9,14 @@ exports.create = (req, res) => {
       });
     }
   
+    const token = req.headers.authorization.split(" ")[1];
+    const {userId} = jwt.verify(token,'RANDOM_TOKEN_SECRET');
+
     // Create a Sharing
     const sharing = new Sharing({
-      title: req.body.title,
-      content: req.body.content,
-      image: req.body.image,
-      users_id: req.body.users_id,
+      content : req.body.content,
+      articles_id : req.body.articles_id,
+      users_id : userId
     });
   
     // Save Sharing in the database
@@ -37,6 +40,18 @@ exports.findAll = (req, res) => {
       else res.send(data);
     });
 };
+
+exports.findAllByArticle = (req, res) => {
+  Sharing.getAllByArticle(req.params.id, (err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving articles."
+      });
+    else res.send(data);
+  });
+}
+
 
 exports.findOne = (req, res) => {
     Sharing.findById(req.params.sharingId, (err, data) => {

@@ -9,6 +9,9 @@ module.exports = app => {
   // Retrieve all Articles
   app.get("/articles", auth, articles.findAll);
 
+  // Retrieve all Articles of the authenticated
+  app.get("/my_articles", auth, articles.findAllByUser);
+
   // Retrieve a single Article with articleId
   app.get("/articles/:articleId", auth, articles.findOne);
 

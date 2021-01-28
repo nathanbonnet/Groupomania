@@ -41,6 +41,19 @@ exports.findAll = (req, res) => {
     });
 };
 
+exports.findAllByUser = (req, res) => {
+  const token = req.headers.authorization.split(" ")[1];
+  const {userId} = jwt.verify(token,'RANDOM_TOKEN_SECRET');
+  Article.getAllByOwner(userId, (err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving articles."
+      });
+    else res.send(data);
+  });
+}
+
 exports.findOne = (req, res) => {
     Article.findById(req.params.articleId, (err, data) => {
       if (err) {

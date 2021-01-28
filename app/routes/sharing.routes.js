@@ -9,6 +9,9 @@ module.exports = app => {
   // Retrieve all Sharings
   app.get("/sharings", auth, sharings.findAll);
 
+  // Retrieve all Sharings by article
+  app.get("/articles/:id/sharings", auth, sharings.findAllByArticle);
+
   // Retrieve a single Sharing with sharingId
   app.get("/sharings/:sharingId", auth, sharings.findOne);
 

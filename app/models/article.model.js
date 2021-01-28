@@ -41,7 +41,7 @@ Article.findById = (articleId, result) => {
 };
 
 Article.getAll = result => {
-  sql.query("SELECT * FROM articles", (err, res) => {
+  sql.query("select a.id, a.title, a.users_id, a.content, a.date, u.firstName, u.lastName from articles a inner join users u on a.users_id = u.id;", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
@@ -51,6 +51,23 @@ Article.getAll = result => {
     console.log("articles: ", res);
     result(null, res);
   });
+};
+
+Article.getAllByOwner = (id, result) => {
+  sql.query(
+    "select a.id, a.title, a.users_id, a.content, a.date, u.firstName, u.lastName from articles a inner join users u on a.users_id = u.id WHERE u.id = ?;",
+    [id],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+
+      console.log("articles: ", res);
+      result(null, res);
+    }
+  );
 };
 
 Article.updateById = (id, article, result) => {

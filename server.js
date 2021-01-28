@@ -23,6 +23,7 @@ app.get("/", (req, res) => {
 
 require("./app/routes/user.routes.js")(app);
 require("./app/routes/article.routes.js")(app);
+require("./app/routes/sharing.routes.js")(app);
 // set port, listen for requests
 app.listen(3000, () => {
   console.log("Server is running on port 3000.");
