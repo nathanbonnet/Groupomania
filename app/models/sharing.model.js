@@ -89,6 +89,24 @@ Sharing.getAllByArticle = (id, result) => {
   );
 };
 
+Sharing.getAllByOwner = (id, result) => {
+  console.log(id)
+  sql.query(
+    "SELECT s.id, s.users_id, s.content, s.date, a.title FROM sharings s INNER JOIN users u ON s.users_id = u.id INNER JOIN articles a ON s.articles_id = a.id WHERE u.id = ?;",
+    [id],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+
+      console.log("articles: ", res);
+      result(null, res);
+    }
+  );
+};
+
 Sharing.remove = (id, result) => {
   sql.query("DELETE FROM sharings WHERE id = ?", id, (err, res) => {
     if (err) {
